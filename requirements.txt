@@ -1,0 +1,4 @@
+qgiscommons
+wincertstore
+
+# test requirements

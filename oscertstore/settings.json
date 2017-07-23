@@ -1,0 +1,16 @@
+[
+	{"name":"import_enabled",
+	 "label": "Import Intermediate Certs",
+	 "description": "Import Windows intermediate certificate authorities on startup",
+	 "type": "bool",
+	 "default": true,
+	 "group": "General Settings"
+	},
+	{"name":"import_successfully_run",
+	 "label": "Import was successfully run",
+	 "description": "This flag is set when a successful import has completed",
+	 "type": "bool",
+	 "default": false,
+	 "group": "General Settings"
+	}
+]
