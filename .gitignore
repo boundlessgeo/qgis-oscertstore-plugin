@@ -6,6 +6,7 @@ __pycache__/
 # Boundless specific
 travis_secrets.tar.gz
 ext-libs/
+ssh_config
 
 # C extensions
 *.so

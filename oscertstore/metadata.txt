@@ -13,7 +13,7 @@ roles=desktop-qgis-plugin-dev
 
 icon=icons/desktop.svg
 
-tags=boundless, certificate
+tags=boundless,certificate,windows
 
 homepage=http://boundlessgeo.com
 tracker=https://github.com/boundlessgeo/qgis-oscertstore-plugin/issues
