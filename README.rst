@@ -1,7 +1,7 @@
 OS Certificate Store
 ==================
 
-[Write your plugin description here]
+Import intermediate certificates from the Windows certificate manager into the QGIS certificate store.
 
 Installation
 ************
