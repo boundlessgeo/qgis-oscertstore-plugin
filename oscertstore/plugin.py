@@ -85,9 +85,7 @@ class OsCertificateStore:
         if not self.is_supported():
             return
 
-        icon_setting = QIcon(os.path.dirname(__file__) + "/icons/desktop.svg")
-
-        self.action_setting = QAction(icon_setting, "Import Windows intermediate certificate authorities on startup", self.iface.mainWindow())
+        self.action_setting = QAction("Import Windows intermediate certificate authorities on startup", self.iface.mainWindow())
         self.action_setting.setObjectName("enableoscertstore")
         self.action_setting.setCheckable(True)
         self.action_setting.setChecked(pluginSetting('import_enabled'))

@@ -79,5 +79,5 @@ def run(logger):
         return True
     else:
         logger.log("No CAs found to store in auth system db")
-    return False
+    return True
 
