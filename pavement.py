@@ -121,7 +121,8 @@ def install3(options):
 ])
 def package(options):
     '''create package for plugin'''
-    builddocs(options)
+    # Skip docs for this plugin
+    ###builddocs(options)
     package_file = options.plugin.package_dir / ('%s.zip' % options.plugin.name)
     with zipfile.ZipFile(package_file, "w", zipfile.ZIP_DEFLATED) as f:
         if not hasattr(options.package, 'tests'):
