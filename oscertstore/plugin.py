@@ -40,13 +40,13 @@ try:
 except ImportError:
     from qgis.PyQt.QtCore import QSettings as QgsSettings
 
+
+SETTINGS_KEY = "Boundless/Plugins/OSCertStore"
+
 # This plugin will normaly only run on Windows, the flag
 # allows the GUI (but not certs import of course) to work
 # on Linux for development and testing purposes
 TEST_ON_LINUX = QgsSettings().value(SETTINGS_KEY + '/test_on_linux', False, type=bool)
-
-
-SETTINGS_KEY = "Boundless/Plugins/OSCertStore"
 
 class OsCertificateStore:
 
