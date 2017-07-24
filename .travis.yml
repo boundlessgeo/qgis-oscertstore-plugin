@@ -9,9 +9,8 @@ env:
   global:
   # The plugin basename (the name of the main folder that contains the plugin source code)
   - PLUGIN_NAME=oscertstore
-  # If the build needs docker compose:
-  #- DOCKER_VERSION=1.12.0-0~trusty
-  #- DOCKER_COMPOSE_VERSION=1.7.1
+  - secure: "jcBa7imgMwF+tH4obmaW+hZdv4ey/GX9jFCGa1LJpyBydOjaWKbOU/c32DiY0i9IVZGHArLblQ6aRE8aY2/ep0N/z4oygQyqGocqoAomXawEAXEJzrcSyQJOioDU2It75idtDpbS+Y6meL2tOBVLNa0u/owo5CpWdH5nyf9rcK7T4S3fV7zQPYLydHJ+eRQEyP1JPQzr9b6pMSFmjEFqgLOdgfuLzXEGmnZ2Zvh0Ck9gEP+dcgJaro90/YJkxfpKp0WYO9XpXmW0y7ZXInO3Ut81NRQFui3D5lNBk+Q6TnI5+umWIpxElr30ip3viyLqsxwHj1TKhPfI+V0WReHDr7YB7bC2eCAGNQCwbRmo6aXq2aRgoe48rrUJnNxk0j7vhva8DnfGVH5W/0nLOYesh0esJJBVYTUtopVwMwPs26rPL7CYHjU3uf0pIjX1dxl0+7rHgQ7DjmvXhofNYMLP2OEE9070MBL2aQL9QyrRuVhZljZOycoXSWqNbE1S/DYhIC6B9O7pUXq6JGQ86ySsAqZDK2+QZMDKzNNuMgiqTlVhowd+RodzYJ5eqWhbCImNK0eQovHamm7EhBcZc+Fr7+Ns6NwgHl/bhV4nor8CkVukIJ14vCm/cQPFxDfbpVEd5iITBUS+yIb1rdNVh+vZJ4t0ZLXnCy+zCqw63zKbKcI="
+  - secure: "D/B0iIPreigyU9Cg7QNPTdSsZLNZdz8yDlPZY8yzBZb0Dsqn8i/jDW6GMGM7luLMLZ9wayyelyg3wEV+bTg235yxpRCVKTTcgA8R0UCW51DeXI3vC+jqE8v2aQccy74+qHCqbhAICYjwdy5fp4Ht7yOYwvqMaChDdYe55TwAkjhxg6S5M0yJMvz+EeJWWr4lpWvRU6pTJU5kgQvUNErKJ5E4KTuwI0s8bhYpiJgdbW+iiAVCch06dMOcLcbZJHnTu+2DegxGgDpCJDlMXYKPWuHHNMhSOMLa63iyp5QInEwZpNL72AEbbPRUVDjv/JA10gQug5BVNwunpm/2aFZ3HTwQ7ke0pPzMkUy4iq9xoRxPlREVEclH1HHqM1JES2BU9fE84s6hPqyABVATjodWhhlqI7qK1lk5+D4IumZzvMU5di0y0Wv7hbG3SkQOIdubKOQAEIpBJx6pNZpzh95rWi9sjp3htylGsg+TjSzMjWPlZy3VPQbmHF+uQmIv9F1TzUUhBMamzIanTa434pIS0eggywPUTpTOrA59z1zIhhnZyuhXgNyfsVqCa1XfwTj3A7cAEp1G69E+8wzahUe+dWaZJg704a1Cxtozxnu/ipV7B9dkeq2VuOZYHTl+IhVrZ3L2ksLG11L1TmuMdDu3dDhsg11YYb4WIkoqdyh2tMc="
   matrix:
   - QGIS_VERSION_TAG=release PYTHON_EXECUTABLE=python PIP_EXECUTABLE=pip
   - QGIS_VERSION_TAG=master_2 PYTHON_EXECUTABLE=python PIP_EXECUTABLE=pip
@@ -24,15 +23,6 @@ before_install:
 - docker pull boundlessgeo/qgis-testing-environment:${QGIS_VERSION_TAG}
 - docker tag boundlessgeo/qgis-testing-environment:${QGIS_VERSION_TAG} qgis-testing-environment
 install:
-# If the build needs docker compose:
-#- apt-cache madison docker-engine
-#- sudo apt-get -o Dpkg::Options::="--force-confnew" install -y docker-engine=${DOCKER_VERSION}
-#- curl -L https://github.com/docker/compose/releases/download/${DOCKER_COMPOSE_VERSION}/docker-compose-`uname -s`-`uname -m` > docker-compose
-#- chmod +x docker-compose
-#- sudo mv docker-compose /usr/local/bin
-#- docker-compose up -d
-#- docker-compose ps
-
 # Standard docker (no-compose):
 - docker run -d --name qgis-testing-environment -v ${TRAVIS_BUILD_DIR}:/tests_directory -e DISPLAY=:99 qgis-testing-environment
 - sleep 10
@@ -45,3 +35,22 @@ script:
 - docker exec -it qgis-testing-environment sh -c "echo '${PLUGIN_NAME} has no unit tests yet, please create them and add here'"
 # Example: - docker exec -it qgis-testing-environment sh -c "qgis_testrunner.sh ${PLUGIN_NAME}.tests.testerplugin.run_tests"
 # Note: see any other active plugin for slack and automatic deployment configuration
+
+after_success:
+- mkdir /home/travis/.ssh/
+- chmod 700 /home/travis/.ssh/
+- openssl aes-256-cbc -K $encrypted_34a994aeca92_key -iv $encrypted_34a994aeca92_iv -in travis_secrets.tar.gz.enc -out travis_secrets.tar.gz -d
+- tar xzvf travis_secrets.tar.gz
+- mv id_rsa.qgisrepoguest /home/travis/.ssh/id_rsa.qgisrepoguest
+- mv ssh_config /home/travis/.ssh/config
+- chmod 600 /home/travis/.ssh/id_rsa.qgisrepoguest
+- chmod 600 /home/travis/.ssh/config
+- export RELEASE_ZIPNAME=${PLUGIN_NAME}.zip
+- echo "Uploading ${RELEASE_ZIPNAME} to QGIS Dev..."
+- scp ${PLUGIN_NAME}.zip qgisrepoguest:${UPLOADS}/${RELEASE_ZIPNAME}
+- export GIT_REV=$(git rev-parse --short HEAD)
+- ssh qgisrepoguest "${UPDATER} update --dev --role desktop-qgis-plugin-dev --git-hash ${GIT_REV} ${RELEASE_ZIPNAME}"
+notifications:
+  slack:
+    rooms:
+      secure: "hU8Pt/1tC/NltNTHm0WJYXSVgiHKWtEa74pyGtVdvF7//RCfVI50DZ2Izn3AfRBbN3kfyKY1/sHpuu+juxtwqpBjP0UQz6HJGNdWByL8nGlHvhc8/eTab8e3nmadrQD+fPIWL+WlhOQtKId/2R8NpkjHa5DkflPCfjtUh6yYrhiixbEZZxlZ86NQeawGdubj8YnXYdB+NVCU+Jba2Xcvlz1TI+qHiOwkUcUUYP/QzuYQtysofeZKJPKAPdqlZdJfEJ40wjV36PZN8C6bYupyURm6RJlIc9SAF5YbRZJZVkyDGUsw+EaE6cUIGAF+CS4dtfR4MVfCfqQkLn+0OZPQxVIxH0eHAjduwRN1jsuWWrlNufVDqkzdhQKEvHLd1hDvuvQqFUGjNNB3ATsCnuvbMHJD7ml6RR8CnbJ52TDxigsqZAirM30bqXqmnK9LG5HfqyXJMKe8TN+E+DoXiLVrDd5Hk4jEMKiBnsFge7l7PjlvmrPPIoyOs+hIOAZvN+KGPsZhO8ocZGOnBhaE9AeDu6sT6jfBa36+ja67UCMce381YZvR5Obuold7gcGOgaQEqr4BuaBvTJgaXvsmnDVMZCcBI1rRIG4mtbI85oNtmbsy14pzAVgrShOYRG03HJm4wJTtZAoneX6F+8YiUu8JHm5QKV6hJ0rNixRmD26Mw80="
