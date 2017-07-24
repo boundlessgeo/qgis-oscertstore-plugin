@@ -22,18 +22,15 @@ __copyright__ = '(C) 2017 Boundless, http://boundlessgeo.com'
 
 # This will get replaced with a git SHA1 when you do a git archive
 
+import ConfigParser
 import os
-import webbrowser
-from sys import platform
 from functools import partial
-
-from qgis.PyQt.QtGui import QIcon
-from qgis.PyQt.QtWidgets import QAction
+from sys import platform
 
 from qgis.core import QgsApplication, QgsMessageLog, QgsMessageOutput
 from qgis.gui import QgsMessageBar
-
-from pyplugin_installer.installer_data import plugins
+from qgis.PyQt.QtGui import QIcon
+from qgis.PyQt.QtWidgets import QAction
 
 try:
     from qgis.core import QgsSettings
@@ -175,63 +172,75 @@ class OsCertificateStore:
         return msg
 
     def _pluginDetails(self, namespace):
-        plugin = plugins.all()[namespace]
+        config = DictParser()
+        config.readfp(open(os.path.join(os.path.realpath(os.path.dirname(__file__)), 'metadata.txt')))
+        plugin = config.as_dict()['general']
+
         html = '<style>body, table {padding:0px; margin:0px; font-family:verdana; font-size: 1.1em;}</style>'
         html += '<body>'
         html += '<table cellspacing="4" width="100%"><tr><td>'
-        html += '<h1>{}</h1>'.format(plugin['name'])
-        html += '<h3>{}</h3>'.format(plugin['description'])
+        html += '<h1>{}</h1>'.format(plugin.get('name'))
+        html += '<h3>{}</h3>'.format(plugin.get('description'))
 
-        if plugin['about'] != '':
-            html += plugin['about'].replace('\n', '<br/>')
+        if plugin.get('about'):
+            html += plugin.get('about').replace('\n', '<br/>')
 
         html += '<br/><br/>'
 
-        if plugin['category'] != '':
-            html += '{}: {} <br/>'.format(self.tr('Category'), plugin['category'])
+        if plugin.get('category'):
+            html += '{}: {} <br/>'.format(self.tr('Category'), plugin.get('category'))
 
-        if plugin['tags'] != '':
-            html += '{}: {} <br/>'.format(self.tr('Tags'), plugin['tags'])
+        if plugin.get('tags'):
+            html += '{}: {} <br/>'.format(self.tr('Tags'), plugin.get('tags'))
 
-        if plugin['homepage'] != '' or plugin['tracker'] != '' or plugin['code_repository'] != '':
+        if plugin.get('homepage') or plugin.get('tracker') or plugin.get('code_repository'):
             html += self.tr('More info:')
 
-            if plugin['homepage'] != '':
-                html += '<a href="{}">{}</a> &nbsp;'.format(plugin['homepage'], self.tr('homepage') )
+            if plugin.get('homepage'):
+                html += '<a href="{}">{}</a> &nbsp;'.format(plugin.get('homepage'), self.tr('homepage') )
 
-            if plugin['tracker'] != '':
-                html += '<a href="{}">{}</a> &nbsp;'.format(plugin['tracker'], self.tr('bug_tracker') )
+            if plugin.get('tracker'):
+                html += '<a href="{}">{}</a> &nbsp;'.format(plugin.get('tracker'), self.tr('bug_tracker') )
 
-            if plugin['code_repository'] != '':
-                html += '<a href="{}">{}</a> &nbsp;'.format(plugin['code_repository'], self.tr('code_repository') )
+            if plugin.get('code_repository'):
+                html += '<a href="{}">{}</a> &nbsp;'.format(plugin.get('code_repository'), self.tr('code_repository') )
 
             html += '<br/>'
 
         html += '<br/>'
 
-        if plugin['author_email'] != '':
-            html += '{}: <a href="mailto:{}">{}</a>'.format(self.tr('Author'), plugin['author_email'], plugin['author_name'])
+        if plugin.get('author_email'):
+            html += '{}: <a href="mailto:{}">{}</a>'.format(self.tr('Author email'), plugin.get('author_email'), plugin.get('author_name'))
             html += '<br/><br/>'
-        elif plugin['author_name'] != '':
-            html += '{}: {}'.format(self.tr('Author'), plugin['author_name'])
+        elif plugin.get('author'):
+            html += '{}: {}'.format(self.tr('Author'), plugin.get('author'))
             html += '<br/><br/>'
 
-        if plugin['version_installed'] != '':
-            ver = plugin['version_installed']
+        if plugin.get('version_installed'):
+            ver = plugin.get('version_installed')
             if ver == '-1':
                 ver = '?'
 
-            html += self.tr('Installed version: {} (in {})<br/>'.format(ver, plugin['library']))
+            html += self.tr('Installed version: {} (in {})<br/>'.format(ver, plugin.get('library')))
 
-        if plugin['version_available'] != '':
-            html += self.tr('Available version: {} (in {})<br/>'.format(plugin['version_available'], plugin['zip_repository']))
+        if plugin.get('version_available'):
+            html += self.tr('Available version: {} (in {})<br/>'.format(plugin.get('version_available'), plugin.get('zip_repository')))
 
-        if plugin['changelog'] != '':
+        if plugin.get('changelog'):
             html += '<br/>'
-            changelog = self.tr('Changelog:<br/>{} <br/>'.format(plugin['changelog']))
+            changelog = self.tr('Changelog:<br/>{} <br/>'.format(plugin.get('changelog')))
             html += changelog.replace('\n', '<br/>')
 
         html += '</td></tr></table>'
         html += '</body>'
 
         return html
+
+class DictParser(ConfigParser.ConfigParser):
+
+    def as_dict(self):
+        d = dict(self._sections)
+        for k in d:
+            d[k] = dict(self._defaults, **d[k])
+            d[k].pop('__name__', None)
+        return d
