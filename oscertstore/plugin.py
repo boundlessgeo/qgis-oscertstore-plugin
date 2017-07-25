@@ -61,11 +61,6 @@ class OsCertificateStore:
             addTestModule(testerplugin, "OS Certificate Store")
         except:
             pass
-        
-        
-        # Run on startup
-        if QgsSettings().value(SETTINGS_KEY + '/import_enabled', True, type=bool):
-            self.run_triggered(False)
 
 
     def log(self, msg, level=QgsMessageLog.INFO):
@@ -114,6 +109,10 @@ class OsCertificateStore:
 
         # No toolbar and other menus
         #self.iface.addToolBarIcon(self.action)
+                
+        # Run on startup
+        if QgsSettings().value(SETTINGS_KEY + '/import_enabled', True, type=bool):
+            self.run_triggered(False)
 
 
     def unload(self):
