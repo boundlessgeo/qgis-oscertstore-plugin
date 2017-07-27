@@ -3,7 +3,7 @@ name=OS Certificate Store
 description=Adds functionality for working with the operating system's native certificate store.
 about=<p>Import intermediate certificates from the Windows certificate manager into the QGIS certificate store.</p>
 category=Plugins
-qgisMinimumVersion=2.0
+qgisMinimumVersion=2.12
 version=1.0
 
 author=Boundless
