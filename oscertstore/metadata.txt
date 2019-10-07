@@ -3,21 +3,19 @@ name=OS Certificate Store
 description=Adds functionality for working with the operating system's native certificate store.
 about=<p>Import intermediate certificates from the Windows certificate manager into the QGIS certificate store.</p>
 category=Plugins
-qgisMinimumVersion=2.12
-version=1.0
+qgisMinimumVersion=3.0
+version=1.1.0
 
-author=Boundless
-email=info@boundlessgeo.com
+author=Planet Federal
+email=info@federal.planet.com
 
-roles=desktop-qgis-plugin-dev
+icon=icons/certificate.svg
 
-icon=icons/desktop.svg
+tags=planet,certificate,windows
 
-tags=boundless,certificate,windows
-
-homepage=http://boundlessgeo.com
-tracker=https://github.com/boundlessgeo/qgis-oscertstore-plugin/issues
-repository=https://github.com/boundlessgeo/qgis-oscertstore-plugin
+homepage=https://planet.com
+tracker=https://github.com/planetfederal/qgis-oscertstore-plugin/issues
+repository=https://github.com/planetfederal/qgis-oscertstore-plugin
 
 experimental=False
 deprecated=False
