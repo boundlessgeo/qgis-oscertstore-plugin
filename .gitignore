@@ -3,9 +3,10 @@ __pycache__/
 *.py[cod]
 *$py.class
 
-# Boundless specific
+# Planet specific
 travis_secrets.tar.gz
 ext-libs/
+extlibs/
 ssh_config
 
 # C extensions
@@ -95,3 +96,4 @@ ENV/
 
 # plugin settings page (build automatically)
 +docs/settingsconf.rst
+*.zip
